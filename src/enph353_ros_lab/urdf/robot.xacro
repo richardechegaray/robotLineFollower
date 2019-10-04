@@ -1,0 +1,188 @@
+<?xml version='1.0'?>
+
+<robot name="robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="chassis_width" value="0.15"/>
+  <xacro:property name="chassis_length" value="0.2"/>
+  <xacro:property name="chassis_height" value="0.05"/>
+  <xacro:property name="chassis_mass" value="0.5"/>
+
+  <xacro:property name="wheel_radius" value="0.04"/>
+  <xacro:property name="wheel_width" value="0.03"/>
+  <xacro:property name="wheel_mass" value="0.075"/>
+
+  <xacro:property name="castor_radius" value="0.025"/>
+  <xacro:property name="castor_mass" value="0.1"/>
+
+  <xacro:property name="camera_link" value="0.05" /> <!-- Size of square 'camera' box -->
+
+  <!-- <xacro:include filename="$(find enph353_ros_lab)/urdf/robot.gazebo" /> -->
+  <xacro:include filename="$(find enph353_ros_lab)/urdf/macros.xacro" />
+
+
+  <!-- <node type="camera.py"
+        name="camera"
+        output="screen">
+  </node>
+
+  <node type="controller.py"
+        name="controller"
+        output="screen">
+  </node>
+
+  <node type="differential_drive.py"
+        name="differential drive"
+        output="screen">
+  </node> -->
+  
+  <link name='chassis'>
+
+    <xacro:box_inertial name="chassis" m="${chassis_mass}" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}"/>
+
+    <collision name='chassis_collision'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+
+    <visual name='chassis_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </visual>
+
+  </link>
+
+
+
+  <link name="castor">
+    <xacro:sphere_inertial name="castor" m="${castor_mass}" r="${castor_radius}" />
+
+    <xacro:castor_collision radius="${castor_radius}" x="0" y="0" z="0" r="0" p="0" yaw="0"/>
+
+    <xacro:castor_visual x="0" y="0" z="0" r="0" p="0" yaw="0" radius="${castor_radius}" />
+  </link>
+
+  <link name="bottomleftwheel">
+    <xacro:cylinder_inertial name="topleftwheel" m="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}"/>
+
+    <xacro:wheel_collision radius="${wheel_radius}" width="${wheel_width}" x="0" y="0" z="0" r="1.57" p="0" yaw="0"/>
+
+    <xacro:wheel_visual x="0" y="0" z="0" r="1.57" p="0" yaw="0" radius="${wheel_radius}" width="${wheel_width}"/>
+  </link>
+
+  <link name="bottomrightwheel">
+    <xacro:cylinder_inertial name="topleftwheel" m="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}"/>
+
+    <xacro:wheel_collision radius="${wheel_radius}" width="${wheel_width}" x="0" y="0" z="0" r="-1.57" p="0" yaw="0"/>
+
+    <xacro:wheel_visual x="0" y="0" z="0" r="-1.57" p="0" yaw="0" radius="${wheel_radius}" width="${wheel_width}"/>
+  </link> 
+
+
+ <joint name="castorjoint" type ="continuous">
+    <xacro:castor_joint x="0.075" y="0" z="-0.02" r="0" p="0" yaw="0" parentlink="chassis" childlink="castor"/>
+  </joint> 
+
+  <joint name="bottomleftwheeljoint" type ="continuous">
+    <xacro:wheel_joint x="-0.075" y="0.10" z="-0.03" r="0" p="0" yaw="0" parentlink="chassis" childlink="bottomleftwheel"/>
+    <axis xyz="0 1 0"/>  
+  </joint>
+
+  <joint name="bottomrightwheeljoint" type ="continuous">
+    <xacro:wheel_joint x="-0.075" y="-0.10" z="-0.03" r="0" p="0" yaw="0" parentlink="chassis" childlink="bottomrightwheel"/>
+    <axis xyz="0 1 0"/>  
+  </joint> 
+
+
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="${camera_link} 0 ${0.05 - 0.01*2}" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="camera_link"/>
+  </joint>  
+
+  <!-- Camera -->
+  <link name="camera_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link> 
+
+<gazebo>
+  <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    <alwaysOn>true</alwaysOn>
+    <updateRate>${30}</updateRate>
+    <leftJoint>base_link_right_wheel_joint</leftJoint>
+    <rightJoint>base_link_left_wheel_joint</rightJoint>
+    <wheelSeparation>0.5380</wheelSeparation>
+    <wheelDiameter>0.2410</wheelDiameter>
+    <torque>20</torque>
+    <commandTopic>cmd_vel</commandTopic>
+    <odometryTopic>odom</odometryTopic>
+    <odometryFrame>odom</odometryFrame>
+    <robotBaseFrame>base_footprint</robotBaseFrame>
+  </plugin>
+</gazebo> 
+
+<!-- camera -->
+<gazebo reference="camera_link">
+  <sensor type="camera" name="camera1">
+    <update_rate>30.0</update_rate>
+    <camera name="head">
+      <horizontal_fov>1.3962634</horizontal_fov>
+      <image>
+        <width>800</width>
+        <height>800</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.02</near>
+        <far>300</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <!-- Noise is sampled independently per pixel on each frame.
+              That pixel's noise value is added to each of its color
+              channels, which at that point lie in the range [0,1]. -->
+        <mean>0.0</mean>
+        <stddev>0.007</stddev>
+      </noise>
+    </camera>
+    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>0.0</updateRate>
+      <cameraName>rrbot/camera1</cameraName>
+      <imageTopicName>image_raw</imageTopicName>
+      <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+      <frameName>camera_link</frameName>
+      <hackBaseline>0.07</hackBaseline>
+      <distortionK1>0.0</distortionK1>
+      <distortionK2>0.0</distortionK2>
+      <distortionK3>0.0</distortionK3>
+      <distortionT1>0.0</distortionT1>
+      <distortionT2>0.0</distortionT2>
+    </plugin>
+  </sensor>
+</gazebo>
+
+</robot>

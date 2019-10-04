@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<robot>
+  <macro name="cylinder_inertial" params="name m r h">
+    <inertial name="${name}_intertial">
+      <mass value="${m}"/>
+      <inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
+        iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
+        izz="${m*r*r/2}"/>
+    </inertial>
+  </macro>
+
+  <macro name="box_inertial" params="name m x y z">
+    <inertial name="${name}_inertial">
+      <mass value="${m}"/>
+      <inertia  ixx="${m*(y*y+z*z)/12}" ixy = "0" ixz = "0"
+        iyy="${m*(x*x+y*y)/12}" iyz = "0"
+        izz="${m*(x*x+z*z)/12}"/>
+    </inertial>
+  </macro>
+
+  <macro name="sphere_inertial" params="name m r">
+    <inertial name="${name}_inertial">
+      <mass value="${m}"/>
+      <inertia  ixx="${2*m*r*r/5}" ixy = "0" ixz = "0"
+        iyy="${2*m*r*r/5}" iyz = "0"
+        izz="${2*m*r*r/5}"/>
+    </inertial>
+  </macro>
+
+
+  <macro name="castor_collision" params="radius x y z r p yaw">
+    <collision name="castor_collision">
+      <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${yaw}"/>
+      <geometry>
+        <sphere radius="${radius}" />
+      </geometry>
+    </collision>
+  </macro>
+
+  <macro name="castor_visual"  params="x y z r p yaw radius">
+    <visual name="wheel_visual">
+      <origin xyz="${x} ${y} ${z}" rpy=" ${r} ${p} ${yaw}"/>
+       <geometry>
+        <sphere radius="${radius}" />
+      </geometry>
+    </visual>
+  </macro>
+
+  <macro name="castor_joint" params="x y z r p yaw parentlink childlink">
+    <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${yaw}"/>
+    <parent link="${parentlink}"/>
+    <child link="${childlink}"/>
+  </macro>
+
+
+  <macro name="wheel_collision" params="radius width x y z r p yaw">
+    <collision name="wheel_collision">
+      <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${yaw}"/>
+      <geometry>
+        <cylinder radius="${radius}" length=" ${width}"/>
+      </geometry>
+    </collision>
+  </macro>
+
+  <macro name="wheel_visual"  params="x y z r p yaw radius width">
+    <visual name="wheel_visual">
+      <origin xyz="${x} ${y} ${z}" rpy=" ${r} ${p} ${yaw}"/>
+       <geometry>
+        <cylinder radius="${radius}" length=" ${width}"/>
+      </geometry>
+    </visual>
+  </macro>
+
+  <macro name="wheel_joint" params="x y z r p yaw parentlink childlink">
+    <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${yaw}"/>
+    <parent link="${parentlink}"/>
+    <child link="${childlink}"/>
+  </macro>
+
+</robot>
