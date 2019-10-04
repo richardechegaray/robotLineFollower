@@ -81,7 +81,7 @@ class robot_control:
 
         velocity = Twist()
         velocity.angular.z = p + d
-        velocity.linear.x = 0.4
+        velocity.linear.x = 0.8
         self.vel_pub.publish(velocity)
 
         print(centre)

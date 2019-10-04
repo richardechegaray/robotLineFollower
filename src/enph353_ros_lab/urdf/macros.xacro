@@ -38,7 +38,7 @@
   </macro>
 
   <macro name="castor_visual"  params="x y z r p yaw radius">
-    <visual name="wheel_visual">
+    <visual name="castor_visual">
       <origin xyz="${x} ${y} ${z}" rpy=" ${r} ${p} ${yaw}"/>
        <geometry>
         <sphere radius="${radius}" />
